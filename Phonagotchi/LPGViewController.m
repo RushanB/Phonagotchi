@@ -47,6 +47,7 @@
                                                           attribute:NSLayoutAttributeCenterX
                                                          multiplier:1.0
                                                            constant:0.0]];
+    //center x
     
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.petImageView
                                                           attribute:NSLayoutAttributeCenterY
@@ -55,6 +56,7 @@
                                                           attribute:NSLayoutAttributeCenterY
                                                          multiplier:1.0
                                                            constant:0.0]];
+    //center y
     
     //BUCKET
     self.bucketImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
@@ -68,10 +70,10 @@
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.bucketImageView
                                                           attribute:NSLayoutAttributeWidth
                                                           relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
+                                                             toItem:nil
                                                           attribute:NSLayoutAttributeNotAnAttribute
-                                                         multiplier:1.0
-                                                           constant:50.0]];
+                                                         multiplier:1                                                           constant:100]];
+    //width
     
     [self.view addConstraint: [NSLayoutConstraint constraintWithItem:self.bucketImageView
                                                            attribute:NSLayoutAttributeHeight
@@ -79,7 +81,8 @@
                                                               toItem:nil
                                                            attribute:NSLayoutAttributeNotAnAttribute
                                                           multiplier:1
-                                                            constant:50]];
+                                                            constant:100]];
+    //height
     
     [self.view addConstraint: [NSLayoutConstraint constraintWithItem:self.bucketImageView
                                                            attribute:NSLayoutAttributeTop
@@ -87,8 +90,10 @@
                                                               toItem:self.view
                                                            attribute:NSLayoutAttributeTop
                                                           multiplier:1
-                                                            constant:500]];
+                                                            constant:450]];
     
+    //top
+
     [self.view addConstraint: [NSLayoutConstraint constraintWithItem:self.bucketImageView
                                                            attribute:NSLayoutAttributeLeft
                                                            relatedBy:NSLayoutRelationEqual
@@ -96,6 +101,7 @@
                                                            attribute:NSLayoutAttributeLeft
                                                           multiplier:1
                                                             constant:40]];
+    //left
     
     //APPLE
     self.appleImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
@@ -110,8 +116,8 @@
                                                               toItem:nil
                                                            attribute:NSLayoutAttributeNotAnAttribute
                                                           multiplier:1
-                                                            constant:25]];
-    
+                                                            constant:50]];
+    //width
     
     [self.view addConstraint: [NSLayoutConstraint constraintWithItem:self.appleImageView
                                                            attribute:NSLayoutAttributeHeight
@@ -119,31 +125,34 @@
                                                               toItem:nil
                                                            attribute:NSLayoutAttributeNotAnAttribute
                                                           multiplier:1
-                                                            constant:25]];
-    
-    [self.view addConstraint: [NSLayoutConstraint constraintWithItem:self.appleImageView
-                                                           attribute:NSLayoutAttributeTop
-                                                           relatedBy:NSLayoutRelationEqual
-                                                              toItem:self.view
-                                                           attribute:NSLayoutAttributeTop
-                                                          multiplier:1
-                                                            constant:510]];
-    
-    [self.view addConstraint: [NSLayoutConstraint constraintWithItem:self.appleImageView
-                                                           attribute:NSLayoutAttributeLeft
-                                                           relatedBy:NSLayoutRelationEqual
-                                                              toItem:self.view
-                                                           attribute:NSLayoutAttributeLeft
-                                                          multiplier:1
                                                             constant:50]];
-   
+    //height
+    
+    [self.view addConstraint: [NSLayoutConstraint constraintWithItem:self.appleImageView
+                                                           attribute:NSLayoutAttributeTop
+                                                           relatedBy:NSLayoutRelationEqual
+                                                              toItem:self.view
+                                                           attribute:NSLayoutAttributeTop
+                                                          multiplier:1
+                                                            constant:465]];
+    //top
+    
+    [self.view addConstraint: [NSLayoutConstraint constraintWithItem:self.appleImageView
+                                                           attribute:NSLayoutAttributeLeft
+                                                           relatedBy:NSLayoutRelationEqual
+                                                              toItem:self.view
+                                                           attribute:NSLayoutAttributeLeft
+                                                          multiplier:1
+                                                            constant:47]];
+   //left
+    
     //PETTING
     UIPanGestureRecognizer *petting = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(pettingGest:)];
     
     [self.view addGestureRecognizer:petting];
     
     //FEEDING
-    UIPinchGestureRecognizer *feeding = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(feedingGest:)];
+    UILongPressGestureRecognizer *feeding = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(feedingGest:)];
     
     [self.view addGestureRecognizer:feeding];
     
@@ -154,11 +163,39 @@
 }
 
 -(void)pettingGest:(UIPanGestureRecognizer *)petting{
-    
+    CGPoint petVelocity = [petting velocityInView:self.view]; //velocity of a pan gesture in view
+    [self.myPet petRate:petVelocity]; //panning rate
+    if(self.myPet.isGrumpy == YES){
+        self.petImageView.image = [UIImage imageNamed:@"grumpy"];
+    }
 }
 
--(void)feedingGest:(UIPinchGestureRecognizer *)feeding{
-    
+-(void)feedingGest:(UILongPressGestureRecognizer *)feeding{
+    CGPoint location = [feeding locationInView:self.view]; //returns point as location in view
+    CGRect newApple; //new rect
+    if((feeding.state == UIGestureRecognizerStateBegan || feeding.state == UIGestureRecognizerStateChanged)){
+        
+        [self.myPet feedPet:location];
+        if(self.myPet.createApple == YES){
+            newApple = CGRectMake(50, 510, self.appleImageView.frame.size.width, self.appleImageView.frame.size.height); //create a new apple instance for applycopy
+            self.appleImageViewCopy.frame = newApple;
+            [self.view addSubview:self.appleImageViewCopy]; //put it in the view
+            
+            self.appleImageViewCopy.alpha = 1;
+            
+            CGPoint touchLocation = [feeding locationInView:self.view];
+            self.appleImageViewCopy.center = touchLocation;
+        }
+    }
+    if(feeding.state == UIGestureRecognizerStateEnded){//when u stop the click
+        [self.myPet feedPetLocation:location];
+        if(self.myPet.giveApple == YES){  //cat gets apple then if its right location
+            [UIImageView animateWithDuration:1.0 delay:1.0 options:0 animations:^{self.appleImageViewCopy.alpha=0.0f;}completion:nil];
+        }else{  //drop the apple out of screen view
+            [UIImageView animateWithDuration:1.0 delay:0.5 options:UIViewAnimationOptionCurveEaseIn animations:^{self.appleImageViewCopy.frame = CGRectMake((location.x),(location.y+500), self.appleImageViewCopy.frame.size.width, self.appleImageViewCopy.frame.size.height);} completion:nil];
+        }
+    }
 }
+
 
 @end

@@ -26,9 +26,11 @@
 }
 
 - (void)petRate:(CGPoint)velocity{
-    if(velocity.x >= 5000 || velocity.x <= -5000){
+    if(velocity.x >= 3000 || velocity.x <= -3000){
+        NSLog(@"Pet is grumpy!");
         _isGrumpy = YES;
     }else{
+        NSLog(@"You firmly pet it.");
         _isGrumpy = NO;
     }
 }
