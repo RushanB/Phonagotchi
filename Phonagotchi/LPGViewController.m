@@ -174,14 +174,13 @@
     CGPoint location = [feeding locationInView:self.view]; //returns point as location in view
     CGRect newApple; //new rect
     if((feeding.state == UIGestureRecognizerStateBegan || feeding.state == UIGestureRecognizerStateChanged)){
-        
         [self.myPet feedPet:location];
         if(self.myPet.createApple == YES){
-            newApple = CGRectMake(50, 510, self.appleImageView.frame.size.width, self.appleImageView.frame.size.height); //create a new apple instance for applycopy
+            newApple = CGRectMake(50, 510, self.appleImageView.frame.size.width, self.appleImageView.frame.size.height); //create a new apple instance for applecopy
             self.appleImageViewCopy.frame = newApple;
             [self.view addSubview:self.appleImageViewCopy]; //put it in the view
             
-            self.appleImageViewCopy.alpha = 1;
+            self.appleImageViewCopy.alpha = 1; //set transparency
             
             CGPoint touchLocation = [feeding locationInView:self.view];
             self.appleImageViewCopy.center = touchLocation;
@@ -191,8 +190,8 @@
         [self.myPet feedPetLocation:location];
         if(self.myPet.giveApple == YES){  //cat gets apple then if its right location
             [UIImageView animateWithDuration:1.0 delay:1.0 options:0 animations:^{self.appleImageViewCopy.alpha=0.0f;}completion:nil];
-        }else{  //drop the apple out of screen view
-            [UIImageView animateWithDuration:1.0 delay:0.5 options:UIViewAnimationOptionCurveEaseIn animations:^{self.appleImageViewCopy.frame = CGRectMake((location.x),(location.y+500), self.appleImageViewCopy.frame.size.width, self.appleImageViewCopy.frame.size.height);} completion:nil];
+        }else{  //drop the apple out of screen view - animation
+            [UIImageView animateWithDuration:1.0 delay:0.5 options:UIViewAnimationOptionCurveEaseIn animations:^{self.appleImageViewCopy.frame = CGRectMake((location.x),(location.y+600), self.appleImageViewCopy.frame.size.width, self.appleImageViewCopy.frame.size.height);} completion:nil];
         }
     }
 }
