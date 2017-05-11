@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
+#import "Pet.h"
 #import "LPGAppDelegate.h"
 
 int main(int argc, char * argv[])
